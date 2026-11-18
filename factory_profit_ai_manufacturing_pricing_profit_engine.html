@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Factory Profit AI — Manufacturing Pricing & Profit Intelligence</title>
+<style>
+:root{
+  --ink:#14142b;
+  --paper:#f1f2ff;
+  --blue:#3a4bff;
+  --yel:#ffd43b;
+  --pink:#ff5c93;
+  --mint:#25c9a0;
+  --red:#ff4d4d;
+  --lav:#e8e9ff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  color:var(--ink);
+  font:16px/1.5 "Trebuchet MS","Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--paper) radial-gradient(#c6caf5 1.35px,transparent 1.35px) 0 0/22px 22px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-weight:900;margin:0;line-height:1.12}
+
+/* Hero & Gamified Rank Strip */
+.hero{
+  background:var(--blue);
+  color:#fff;
+  padding:28px clamp(16px,5vw,60px) 84px;
+  border-bottom:4px solid var(--ink);
+  position:relative;
+}
+.hero-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  flex-wrap:wrap;
+  max-width:1280px;
+  margin:0 auto;
+}
+.hero h1{font-size:clamp(32px,6vw,58px);max-width:15ch;letter-spacing:-0.02em}
+.hero p{max-width:52ch;font-size:17.5px;margin:12px 0 20px;opacity:.96}
+
+.hud-pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hud-pill{
+  background:#fff;
+  color:var(--ink);
+  border:3px solid var(--ink);
+  border-radius:14px;
+  padding:7px 12px;
+  box-shadow:4px 4px 0 var(--ink);
+  font-size:13px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.hud-pill.rank{background:var(--yel)}
+.hud-pill.streak{background:var(--mint)}
+.sound-btn{
+  background:#fff;
+  color:var(--ink);
+  border:3px solid var(--ink);
+  border-radius:14px;
+  padding:7px 12px;
+  box-shadow:4px 4px 0 var(--ink);
+  font:inherit;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+}
+.sound-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+
+/* Buttons & Inputs */
+.btn{
+  font:inherit;
+  font-weight:800;
+  border:3px solid var(--ink);
+  background:var(--yel);
+  color:var(--ink);
+  border-radius:12px;
+  padding:10px 16px;
+  box-shadow:4px 4px 0 var(--ink);
+  cursor:pointer;
+  transition:transform .1s,box-shadow .1s,background .15s;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn.w{background:#fff}
+.btn.p{background:var(--pink);color:#fff}
+.btn.m{background:var(--mint)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:10px;box-shadow:3px 3px 0 var(--ink)}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:4px solid var(--pink);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* Layout */
+main{
+  display:grid;
+  grid-template-columns:1fr 425px;
+  gap:24px;
+  max-width:1280px;
+  margin:-52px auto 48px;
+  padding:0 clamp(12px,3vw,40px);
+  align-items:start;
+}
+@media(max-width:960px){main{grid-template-columns:1fr}.meter{position:static!important;order:-1}}
+
+.card{
+  background:#fff;
+  border:3px solid var(--ink);
+  border-radius:20px;
+  box-shadow:7px 7px 0 var(--ink);
+  padding:20px;
+  margin-bottom:24px;
+}
+.card h2{font-size:22px;display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.n{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:var(--yel);
+  border:3px solid var(--ink);
+  font-size:17px;
+  flex:none;
+}
+.sub{color:#4b4b6b;margin:0 0 14px;font-size:14.5px}
+label{display:block;font-weight:800;font-size:13.5px}
+input[type=text],input[type=number],select{
+  width:100%;
+  font:inherit;
+  font-weight:700;
+  padding:9px 10px;
+  border:3px solid var(--ink);
+  border-radius:10px;
+  background:#fff;
+  margin-top:4px;
+  color:var(--ink);
+}
+.g3{display:grid;grid-template-columns:2fr 2fr 1fr;gap:10px}
+@media(max-width:560px){.g3{grid-template-columns:1fr 1fr}.g3 label:first-child{grid-column:1/-1}}
+
+/* Compact Commercial Terms Strip */
+.terms-bar{
+  margin-top:14px;
+  padding:12px;
+  border:3px solid var(--ink);
+  border-radius:14px;
+  background:var(--lav);
+}
+.terms-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:8px;
+  font-size:13.5px;
+  font-weight:900;
+}
+.terms-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+@media(max-width:560px){.terms-grid{grid-template-columns:1fr}}
+
+/* Cost Tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
+.tile{
+  border:3px solid var(--ink);
+  border-radius:16px;
+  padding:12px;
+  background:color-mix(in srgb,var(--c) 13%,#fff);
+  position:relative;
+  transition:transform .12s;
+}
+.tile:hover{transform:translateY(-2px)}
+.th{display:flex;align-items:center;gap:6px}.th span{font-size:23px}
+.badge{
+  font-style:normal;
+  font-size:10.5px;
+  font-weight:900;
+  background:var(--pink);
+  color:#fff;
+  border:2px solid var(--ink);
+  border-radius:20px;
+  padding:1px 7px;
+  margin-left:auto;
+}
+.tag-type{
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:#4b4b6b;
+  display:block;
+}
+.tile small{display:block;color:#4b4b6b;font-size:12.5px;line-height:1.3;margin:4px 0 8px;min-height:32px}
+.stp{display:flex;gap:6px}.stp input{margin:0;text-align:center;min-width:0}
+.stp button{
+  width:38px;
+  flex:none;
+  font-size:20px;
+  font-weight:900;
+  border:3px solid var(--ink);
+  border-radius:10px;
+  background:var(--c);
+  color:#fff;
+  cursor:pointer;
+}
+.stp button:active{transform:scale(.94)}
+.sh{height:8px;border:2px solid var(--ink);border-radius:6px;margin-top:10px;background:#fff;overflow:hidden}
+.sh i{display:block;height:100%;background:var(--c);transition:width .35s}
+.lev-note{font-size:11px;font-weight:800;color:var(--ink);margin-top:5px;display:flex;justify-content:space-between}
+
+input[type=range]{width:100%;accent-color:var(--blue);height:28px;margin:2px 0;cursor:pointer}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0}
+.chip{
+  border:3px solid var(--ink);
+  border-radius:20px;
+  background:#fff;
+  padding:3px 12px;
+  font-weight:800;
+  font-size:13px;
+  cursor:pointer;
+  font:inherit;
+  transition:background .12s,transform .1s;
+}
+.chip:hover{transform:translateY(-1px)}
+.chip.on{background:var(--yel)}
+.chip.tab-on{background:var(--blue);color:#fff}
+
+/* Sticky Profit Meter */
+.meter{position:sticky;top:14px}
+.face{font-size:60px;line-height:1;display:inline-block}
+.face.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.35) rotate(-8deg)}}
+.vd{padding:13px;border:3px solid var(--ink);border-radius:14px;margin:8px 0 6px;transition:background .3s}
+.vd h3{font-size:20px}.vd span{font-size:13.5px;font-weight:700}
+.vd.bad{background:#ffd6d6}.vd.ok{background:#fff1b3}.vd.good{background:#c8f5e6}.vd.idle{background:#e8e9ff}
+
+#gauge{width:100%;display:block;margin:0 auto}
+#needle{transform-origin:150px 150px;transition:transform .8s cubic-bezier(.3,1.5,.5,1)}
+
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin:8px 0 12px}
+.nums div{border:3px solid var(--ink);border-radius:12px;padding:6px 2px;background:#fff}
+.nums span{display:block;font-size:11.5px;font-weight:800;color:#4b4b6b}.nums b{font-size:17px}
+
+/* Monte Carlo Risk Strip in Meter */
+.mc-box{
+  border:3px solid var(--ink);
+  border-radius:14px;
+  padding:10px 12px;
+  background:#f8f9ff;
+  margin:10px 0 12px;
+}
+.mc-top{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900;margin-bottom:6px}
+.mc-badge{
+  padding:2px 8px;
+  border-radius:12px;
+  border:2px solid var(--ink);
+  font-size:11.5px;
+  font-weight:900;
+}
+.mc-bar{
+  height:14px;
+  border:2.5px solid var(--ink);
+  border-radius:8px;
+  overflow:hidden;
+  display:flex;
+  background:#ffd6d6;
+}
+.mc-bar i{display:block;height:100%;background:var(--mint);transition:width .4s}
+.mc-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:7px;
+  font-size:12px;
+}
+.mc-stats div{background:#fff;border:2px solid var(--ink);border-radius:8px;padding:4px 7px}
+.mc-stats span{display:block;color:#4b4b6b;font-size:10.5px;font-weight:800}
+.mc-stats b{font-size:13px}
+
+/* Stacked Cost Bar */
+.stack{position:relative;display:flex;height:42px;border:3px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
+.stack i{display:block;height:100%;transition:width .45s;border-right:2px solid var(--ink);flex:none}
+.stack .pf{background:var(--mint);display:grid;place-items:center;font:800 12px sans-serif;font-style:normal}
+.stack u{
+  position:absolute;top:0;bottom:0;right:0;
+  display:grid;place-items:center;text-decoration:none;
+  background:repeating-linear-gradient(45deg,rgba(255,77,77,.9) 0 8px,rgba(255,255,255,.78) 8px 16px);
+  border-left:4px solid var(--ink);
+}
+.stack u span{background:#fff;border:2px solid var(--ink);border-radius:8px;padding:0 6px;font-size:11.5px;font-weight:800}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;margin:7px 0 12px}
+.legend b{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* Recommended Fair Price Box */
+.ask{
+  background:var(--yel);
+  border:3px solid var(--ink);
+  border-radius:14px;
+  padding:12px;
+  transform:rotate(-1deg);
+  box-shadow:4px 4px 0 var(--ink);
+}
+.ask-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ask b{font-size:28px;display:block;font-weight:900}
+.ask small{display:block;font-size:12px;font-weight:800;margin-top:2px}
+
+/* Advice & Negotiation Script */
+.tips{list-style:none;padding:0;margin:0}
+.tips li{padding:10px 12px;border:3px solid var(--ink);border-radius:12px;margin-bottom:8px;background:#fff;font-size:14.5px}
+.say{
+  background:var(--lav);
+  border:3px dashed var(--ink);
+  border-radius:14px;
+  padding:13px;
+  margin:10px 0 12px;
+  font-style:italic;
+  font-weight:600;
+  line-height:1.5;
+}
+
+/* Lab & Volume Slabs */
+.lab{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.lab{grid-template-columns:1fr}}
+.box{border:3px solid var(--ink);border-radius:14px;padding:13px;background:#f7f8ff}
+.sup-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:6px;align-items:end;margin-bottom:6px}
+.sup-row label{font-size:11.5px}
+.sup-row input{padding:6px 7px;font-size:13px}
+.o{float:right;font-weight:900}
+
+/* Volume Slabs & Elasticity */
+.slab-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+@media(max-width:640px){.slab-grid{grid-template-columns:1fr}}
+.slab{
+  border:3px solid var(--ink);
+  border-radius:14px;
+  padding:11px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:6px;
+}
+.slab.best{background:#e7fbf4}
+.slab-tag{
+  display:inline-block;
+  font-size:11px;
+  font-weight:900;
+  padding:2px 8px;
+  border-radius:20px;
+  border:2px solid var(--ink);
+  background:var(--yel);
+  width:fit-content;
+}
+.elasticity-banner{
+  margin-top:12px;
+  padding:10px 12px;
+  border:3px solid var(--ink);
+  border-radius:12px;
+  background:#fff8dc;
+  font-size:13.5px;
+}
+
+/* Saved Orders KPI Strip & Table */
+.kpi-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.kpi-box{
+  border:3px solid var(--ink);
+  border-radius:12px;
+  padding:8px 10px;
+  background:var(--lav);
+  text-align:center;
+}
+.kpi-box span{display:block;font-size:11.5px;font-weight:800;color:#4b4b6b}
+.kpi-box b{font-size:17px;font-weight:900}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 6px;border-bottom:2px solid #dcdcf0}
+th{font-weight:900;background:#f7f8ff}
+.sc{overflow-x:auto}
+
+#cv{position:fixed;inset:0;pointer-events:none;z-index:9}
+#toast{
+  position:fixed;bottom:18px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:var(--ink);color:#fff;
+  padding:10px 18px;border-radius:30px;
+  font-weight:800;transition:transform .3s;z-index:10;
+  border:2px solid var(--yel);
+}
+#toast.on{transform:translateX(-50%) translateY(0)}
+#quote{display:none}
+@media print{
+  body *{visibility:hidden}
+  #quote,#quote *{visibility:visible}
+  #quote{display:block;position:absolute;inset:0;padding:32px;background:#fff;color:#000}
+  #quote td,#quote th{border-bottom:1px solid #999;padding:8px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <h1>Will this order make you money?</h1>
+      <p>Type what the order costs you. Our stochastic &amp; unit-economics engine tells you in plain words if it is a safe deal, uncovers hidden credit-period bleed, and calculates the exact price to ask for.</p>
+      <div class="row">
+        <button class="btn" id="sample">▶ Try an example</button>
+        <button class="btn w" id="reset">Start fresh</button>
+      </div>
+    </div>
+    <div class="hud-pills" aria-label="Factory Deal Mastery">
+      <div class="hud-pill rank" id="rankBadge">🏅 Rank: Apprentice Estimator</div>
+      <div class="hud-pill streak" id="streakBadge">🔥 Safe Deals: 0</div>
+      <button type="button" class="sound-btn" id="soundToggle" aria-pressed="true">🔊 SFX: ON</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<div>
+  <!-- STEP 1 -->
+  <section class="card">
+    <h2><span class="n">1</span>What are you making?</h2>
+    <p class="sub">Product name, customer, order quantity, and commercial credit terms.</p>
+    <div class="g3">
+      <label>Product<input type="text" id="product" placeholder="e.g. Metal brackets"></label>
+      <label>Customer<input type="text" id="customer" placeholder="e.g. ABC Engineering"></label>
+      <label>Pieces<input type="number" id="qty" min="1" inputmode="numeric"></label>
+    </div>
+
+    <div class="terms-bar">
+      <div class="terms-head">
+        <span>💳 Payment Terms &amp; Hidden Cost Shield</span>
+        <span id="wcTag" style="color:var(--blue)">Cash bleed: ₹0</span>
+      </div>
+      <div class="chips" id="payChips"></div>
+      <div class="terms-grid">
+        <label>Expected Rework / Rejection Buffer (%)
+          <input type="number" id="rejPct" min="0" max="50" step="0.5" value="2" inputmode="decimal">
+        </label>
+        <label>GST Rate on Quotation (%)
+          <select id="gstRate">
+            <option value="0">0% (Excl. GST)</option>
+            <option value="5">5% GST</option>
+            <option value="12">12% GST</option>
+            <option value="18" selected>18% GST</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card">
+    <h2><span class="n">2</span>What does it cost you?</h2>
+    <p class="sub">Fill what you know. Use + and − to adjust quickly. We track variable vs. fixed overhead and calculate rupee sensitivity per 5% cut.</p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card">
+    <h2><span class="n">3</span>What does the customer offer?</h2>
+    <p class="sub">Drag the slider or type the customer's offer (excluding GST).</p>
+    <label>Customer pays (₹)<input type="number" id="offer" min="0" inputmode="numeric"></label>
+    <input type="range" id="offerS" min="0" max="50000" step="50" aria-label="Customer offer">
+    <label style="margin-top:14px">Out of every ₹100 you charge, how much net profit should you keep? <span class="o" id="mOut"></span></label>
+    <input type="range" id="marginS" min="0" max="60" value="20" aria-label="Target profit">
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card">
+    <h2><span class="n">4</span>Our advice &amp; negotiation script</h2>
+    <ul class="tips" id="tips"></ul>
+    <div class="row" style="margin-top:12px">
+      <span style="font-size:13px;font-weight:900">Message tone:</span>
+      <div class="chips" id="toneChips" style="margin:0"></div>
+    </div>
+    <div class="say" id="say"></div>
+    <div class="row">
+      <button class="btn w" id="copySay">Copy this message</button>
+      <button class="btn" id="quoteBtn">Make quotation (PDF)</button>
+      <button class="btn m" id="saveBtn">Save order</button>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card">
+    <h2><span class="n">5</span>Can you save money or upsell volume?</h2>
+    <p class="sub">Simulate cost cuts, compare suppliers on True Landed Cost (including freight, credit &amp; defect rate), or offer bulk quantity tiers.</p>
+    <div class="lab">
+      <div class="box">
+        <b>✂️ Spend less (What-If Simulator)</b>
+        <label style="margin-top:8px">Cut material cost by <span class="o" id="msO">0%</span></label>
+        <input type="range" id="matS" min="0" max="30" value="0">
+        <label>Cut wasted material by <span class="o" id="wsO">0%</span></label>
+        <input type="range" id="wasS" min="0" max="100" step="5" value="0">
+        <p id="whatif" style="margin:8px 0;font-size:13.5px"></p>
+        <button class="btn w sm" id="applyWhat">Apply savings</button>
+      </div>
+
+      <div class="box">
+        <b>🏆 Smart Supplier Matrix (Landed Cost)</b>
+        <div class="sup-row" style="margin-top:8px">
+          <label>Sup A (₹)<input type="number" id="s1" min="0" value="10000"></label>
+          <label>Freight<input type="number" id="f1" min="0" value="400"></label>
+          <label>Scrap %<input type="number" id="d1" min="0" max="50" value="3"></label>
+          <label>Credit d<input type="number" id="c1" min="0" max="120" value="15"></label>
+        </div>
+        <div class="sup-row">
+          <label>Sup B (₹)<input type="number" id="s2" min="0" value="9400"></label>
+          <label>Freight<input type="number" id="f2" min="0" value="950"></label>
+          <label>Scrap %<input type="number" id="d2" min="0" max="50" value="6"></label>
+          <label>Credit d<input type="number" id="c2" min="0" max="120" value="0"></label>
+        </div>
+        <div class="sup-row">
+          <label>Sup C (₹)<input type="number" id="s3" min="0" value="9800"></label>
+          <label>Freight<input type="number" id="f3" min="0" value="250"></label>
+          <label>Scrap %<input type="number" id="d3" min="0" max="50" value="1.5"></label>
+          <label>Credit d<input type="number" id="c3" min="0" max="120" value="45"></label>
+        </div>
+        <p id="supOut" style="margin:8px 0;font-size:13px"></p>
+        <button class="btn w sm" id="useSup">Use best effective supplier</button>
+      </div>
+    </div>
+
+    <!-- Volume Economies & Wright's Learning Curve -->
+    <div style="margin-top:16px">
+      <b>📈 Volume Tier Upsell Matrix (Wright's 88% Learning Curve + Setup Amortization)</b>
+      <div class="slab-grid" id="slabGrid"></div>
+      <div class="elasticity-banner" id="elasticityBox"></div>
+    </div>
+  </section>
+
+  <!-- SAVED ORDERS -->
+  <section class="card">
+    <h2>📒 Your saved orders</h2>
+    <div class="kpi-strip" id="kpiStrip">
+      <div class="kpi-box"><span>Total Quoted</span><b id="kTotal">₹0</b></div>
+      <div class="kpi-box"><span>Avg Net Margin</span><b id="kMargin">0%</b></div>
+      <div class="kpi-box"><span>Safe Deal Rate</span><b id="kSafe">0%</b></div>
+    </div>
+    <div class="sc">
+      <table id="orders">
+        <thead>
+          <tr><th>Date</th><th>Product</th><th>Pcs</th><th>True Cost</th><th>Offer</th><th>Result</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn w sm" id="csvBtn">Download CSV</button>
+      <button class="btn w sm" id="jsonBtn">Export JSON</button>
+      <button class="btn w sm" id="copyPrompt">Copy AI prompt</button>
+    </div>
+    <p class="sub" style="margin-top:10px;font-size:13px">All sums, Monte Carlo risk simulations, and learning curves are computed deterministically by code—never guessed by an LLM.</p>
+  </section>
+</div>
+
+<!-- STICKY PROFIT METER -->
+<aside class="meter card" aria-live="polite">
+  <div class="row" style="align-items:center;gap:14px">
+    <span class="face" id="face">🏭</span>
+    <div class="vd idle" id="vd" style="flex:1;margin:0">
+      <h3 id="vh"></h3>
+      <span id="vs"></span>
+    </div>
+  </div>
+
+  <svg id="gauge" viewBox="0 0 300 170" role="img" aria-label="Profit meter">
+    <path id="gR" fill="none" stroke="#ff4d4d" stroke-width="26"/>
+    <path id="gY" fill="none" stroke="#ffd43b" stroke-width="26"/>
+    <path id="gG" fill="none" stroke="#25c9a0" stroke-width="26"/>
+    <g id="needle"><line x1="150" y1="150" x2="48" y2="150" stroke="#14142b" stroke-width="7" stroke-linecap="round"/></g>
+    <circle cx="150" cy="150" r="11" fill="#14142b"/>
+    <text x="14" y="168" font-size="12" font-weight="800">LOSS</text>
+    <text x="286" y="168" font-size="12" font-weight="800" text-anchor="end">GREAT</text>
+  </svg>
+
+  <div class="nums">
+    <div><span>True economic cost</span><b id="nC">₹0</b></div>
+    <div><span>They pay</span><b id="nO">₹0</b></div>
+    <div><span>Net profit</span><b id="nK">₹0</b></div>
+  </div>
+
+  <!-- Monte Carlo 2,500-Run Risk Box -->
+  <div class="mc-box">
+    <div class="mc-top">
+      <span>🎲 Monte Carlo Risk (2,500 runs)</span>
+      <span class="mc-badge" id="mcProbBadge">—</span>
+    </div>
+    <div class="mc-bar" title="Green = Profitable scenarios, Red = Loss scenarios">
+      <i id="mcBarFill" style="width:0%"></i>
+    </div>
+    <div class="mc-stats">
+      <div><span>Expected Mean Profit</span><b id="mcMean">₹0</b></div>
+      <div><span>95% Worst-Case (VaR)</span><b id="mcVar">₹0</b></div>
+    </div>
+  </div>
+
+  <b>Where the customer’s money goes</b>
+  <div class="stack" id="stack" style="margin-top:6px"></div>
+  <div class="legend" id="legend"></div>
+
+  <div class="ask">
+    <div class="ask-row">
+      <span>Fair price to ask for</span>
+      <span id="beNote" style="font-size:11.5px;font-weight:900"></span>
+    </div>
+    <b id="nR">₹0</b>
+    <small id="nRu"></small>
+  </div>
+
+  <div class="row" style="margin-top:12px">
+    <button class="btn p" id="useRec" style="flex:1">🎯 Use this price</button>
+    <button class="btn w" id="rerunMc" title="Re-run 2,500 Monte Carlo volatility trials">🎲 Re-sim</button>
+  </div>
+</aside>
+</main>
+
+<div id="quote"></div>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = id => Math.max(0, parseFloat($(id).value) || 0);
+const inr = n => (n < 0 ? "−" : "") + "₹" + Math.abs(Math.round(n)).toLocaleString("en-IN");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* Tactile Web Audio Synthesizer (Zero External Files) */
+let soundOn = true, audioCtx = null;
+function beep(freq = 520, dur = 0.055, type = "triangle", vol = 0.06) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+function chordWin() {
+  [523.25, 659.25, 783.99].forEach((f, i) => setTimeout(() => beep(f, 0.14, "sine", 0.07), i * 65));
+}
+
+/* Cost Definitions with Variable vs Fixed Classification */
+const F = [
+  ["material","🧱","Raw material","What you buy to make it: metal, cloth, wood…","#3a4bff","variable"],
+  ["labour","👷","Workers’ wages","Pay for the time spent on this order","#ff9f1c","variable"],
+  ["electricity","⚡","Electricity","Power used by machines and lights","#e6b800","variable"],
+  ["transport","🚚","Transport","Bringing material in, sending goods out","#9b5de5","variable"],
+  ["machine","⚙️","Machine wear","Setup, tooling, repairs, oil, wear & tear","#00a6d6","fixed"],
+  ["wastage","♻️","Wasted material","Scrap and offcuts you throw away","#ff5c93","variable"],
+  ["other","📦","Anything else","Packing, dies, a share of factory rent","#6c7a89","fixed"]
+];
+
+const PAY_TERMS = [
+  {id:"adv", label:"100% Advance", days:0, adv:1.0},
+  {id:"cod", label:"50% Adv / Delivery", days:7, adv:0.5},
+  {id:"n30", label:"Net 30 Days", days:30, adv:0.0},
+  {id:"n60", label:"Net 60 Days", days:60, adv:0.0},
+  {id:"n90", label:"Net 90 Days", days:90, adv:0.0}
+];
+let activePay = PAY_TERMS[2]; // Default Net 30
+
+const TONES = [
+  {id:"firm", label:"🤝 Firm & Polite"},
+  {id:"upsell", label:"📦 Volume Upsell"},
+  {id:"floor", label:"🛑 Walk-Away Floor"}
+];
+let activeTone = "firm";
+
+/* Build Tiles & Chips */
+$("tiles").innerHTML = F.map(f => `
+  <div class="tile" style="--c:${f[4]}" id="t_${f[0]}">
+    <div class="th">
+      <span>${f[1]}</span>
+      <div>
+        <b>${f[2]}</b>
+        <span class="tag-type">${f[5] === "variable" ? "Direct Variable" : "Fixed / Setup"}</span>
+      </div>
+      <em class="badge" hidden>Biggest</em>
+    </div>
+    <small>${f[3]}</small>
+    <div class="stp">
+      <button type="button" data-k="${f[0]}" data-d="-500" aria-label="Less ${f[2]}">−</button>
+      <input id="${f[0]}" type="number" min="0" inputmode="numeric" placeholder="0" aria-label="${f[2]} in rupees">
+      <button type="button" data-k="${f[0]}" data-d="500" aria-label="More ${f[2]}">+</button>
+    </div>
+    <div class="sh"><i></i></div>
+    <div class="lev-note"><span id="lv_${f[0]}">Share: 0%</span><span id="sv_${f[0]}"></span></div>
+  </div>
+`).join("");
+
+$("chips").innerHTML = [10, 15, 20, 25, 30].map(v => `<button type="button" class="chip" data-m="${v}">${v}%</button>`).join("");
+$("payChips").innerHTML = PAY_TERMS.map(p => `<button type="button" class="chip ${p.id === activePay.id ? "on" : ""}" data-pay="${p.id}">${p.label}</button>`).join("");
+$("toneChips").innerHTML = TONES.map(t => `<button type="button" class="chip ${t.id === activeTone ? "tab-on" : ""}" data-tone="${t.id}">${t.label}</button>`).join("");
+
+let S = {};
+
+/* Deterministic Box-Muller Normal Generator (Seeded PRNG for crisp UI stability unless Re-sim clicked) */
+let mcSeed = 1337;
+function mulberry32(a) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function runMonteCarlo(costs, offer, hiddenCarryAndRework, seed) {
+  const rng = mulberry32(seed);
+  const randNorm = () => {
+    let u = 0, v = 0;
+    while (u === 0) u = rng();
+    while (v === 0) v = rng();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  };
+
+  const map = Object.fromEntries(costs.map(c => [c.k, c.v]));
+  const N = 2500;
+  const profits = new Float64Array(N);
+  let wins = 0, sum = 0;
+
+  // Volatility sigmas calibrated to Indian MSME shop-floor variance
+  for (let i = 0; i < N; i++) {
+    const mat = map.material * Math.max(0.7, 1 + 0.075 * randNorm());
+    const lab = map.labour * Math.max(0.75, 1 + 0.10 * randNorm());
+    const ele = map.electricity * Math.max(0.8, 1 + 0.08 * randNorm());
+    const trn = map.transport * Math.max(0.8, 1 + 0.09 * randNorm());
+    const mac = map.machine * Math.max(0.85, 1 + 0.06 * randNorm());
+    // Scrap & rework exhibits right-skewed tail shocks
+    const wasShock = Math.max(0.6, 1 + 0.18 * randNorm() + (rng() < 0.08 ? 0.25 : 0));
+    const was = map.wastage * wasShock;
+    const oth = map.other;
+    const carry = hiddenCarryAndRework * Math.max(0.7, 1 + 0.12 * randNorm());
+
+    const simCost = mat + lab + ele + trn + mac + was + oth + carry;
+    const p = offer - simCost;
+    profits[i] = p;
+    sum += p;
+    if (p > 0) wins++;
+  }
+
+  profits.sort();
+  const var95 = profits[Math.floor(N * 0.05)]; // 5th percentile worst-case profit
+  return {
+    probProfit: (wins / N) * 100,
+    meanProfit: sum / N,
+    var95
+  };
+}
+
+/* Master Economic Calculation Engine */
+function calc() {
+  const costs = F.map(f => ({k:f[0], l:f[2], c:f[4], type:f[5], v:num(f[0])}));
+  const directCost = costs.reduce((a, c) => a + c.v, 0);
+  const variableCost = costs.filter(c => c.type === "variable").reduce((a, c) => a + c.v, 0);
+  const fixedCost = costs.filter(c => c.type === "fixed").reduce((a, c) => a + c.v, 0);
+
+  const offer = num("offer");
+  const m = Math.min(0.85, num("marginS") / 100);
+  const qty = Math.max(1, num("qty"));
+  const rejPct = num("rejPct") / 100;
+  const gstPct = num("gstRate");
+
+  // Working capital cost of capital (14% p.a. MSME OD/CC rate) on un-advanced capital tied up for credit days
+  const annualRate = 0.14;
+  const financedFraction = 1 - activePay.adv;
+  const wcCost = directCost * financedFraction * annualRate * (activePay.days / 365);
+
+  // Rework / quality rejection buffer applied to variable production costs
+  const reworkCost = variableCost * rejPct;
+
+  const trueTotal = directCost + wcCost + reworkCost;
+  const trueVariable = variableCost + reworkCost + (wcCost * (directCost ? variableCost / directCost : 0));
+  const trueFixed = trueTotal - trueVariable;
+
+  // Fair recommended price solving: (Price - trueTotal) / Price = m  => Price = trueTotal / (1 - m)
+  const rec = trueTotal / (1 - m);
+  const profit = offer - trueTotal;
+  const om = offer > 0 ? (profit / offer) * 100 : -99;
+
+  // Unit economics & Break-Even Quantity at current offer unit price
+  const unitOffer = offer / qty;
+  const unitVar = trueVariable / qty;
+  const unitContribution = unitOffer - unitVar;
+  const breakEvenQty = (unitContribution > 0 && trueFixed > 0) ? Math.ceil(trueFixed / unitContribution) : (profit >= 0 && offer > 0 ? qty : Infinity);
+
+  const mc = directCost > 0 ? runMonteCarlo(costs, offer, wcCost + reworkCost, mcSeed) : {probProfit:0, meanProfit:0, var95:0};
+
+  S = {
+    costs, directCost, variableCost, fixedCost, wcCost, reworkCost,
+    trueTotal, trueVariable, trueFixed, offer, m, qty, rec, profit, om,
+    unitOffer, unitVar, unitContribution, breakEvenQty, gstPct, rejPct, mc,
+    product: $("product").value.trim() || "Custom Components",
+    customer: $("customer").value.trim() || "Valued Customer"
+  };
+  render();
+}
+
+function tween(id, to) {
+  const el = $(id), from = el._v || 0;
+  el._v = to;
+  const t0 = performance.now();
+  (function s(t) {
+    const p = Math.min(1, (t - t0) / 500), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = inr(from + (to - from) * e);
+    if (p < 1) requestAnimationFrame(s);
+  })(t0);
+}
+
+let lastState = "";
+function render() {
+  const {costs, directCost, wcCost, reworkCost, trueTotal, offer, m, qty, rec, profit, om, breakEvenQty, mc} = S;
+  const tp = m * 100;
+
+  $("wcTag").textContent = `Credit + Rework Shield: +${inr(wcCost + reworkCost)}`;
+
+  let st, face, h, sub;
+  if (!directCost) {
+    st = "idle"; face = "🏭"; h = "Fill in your costs"; sub = "We will compute true cost, risk & fair price.";
+  } else if (profit < 0) {
+    st = "bad"; face = "😰"; h = "STOP! You lose " + inr(-profit); sub = `Even before risk, you are ${inr(-profit)} below true cost.`;
+  } else if (om < tp - 0.15) {
+    st = "ok"; face = "😐"; h = "Thin margin (" + om.toFixed(1) + "%)"; sub = `You keep ${inr(profit)}, short of your ${Math.round(tp)}% target (${inr(offer * m)}).`;
+  } else {
+    st = "good"; face = "🤑"; h = "Strong deal! Net " + inr(profit); sub = `Hits ${om.toFixed(1)}% net margin after credit & rework.`;
+  }
+
+  $("vd").className = "vd " + st;
+  $("vh").textContent = h;
+  $("vs").textContent = sub;
+  if (st !== lastState) {
+    $("face").textContent = face;
+    $("face").classList.remove("pop");
+    void $("face").offsetWidth;
+    $("face").classList.add("pop");
+    lastState = st;
+  }
+
+  tween("nC", trueTotal);
+  tween("nO", offer);
+  tween("nK", profit);
+  tween("nR", rec);
+
+  $("nRu").textContent = `${inr(rec / qty)} / pc  •  With ${S.gstPct}% GST: ${inr(rec * (1 + S.gstPct / 100))}`;
+  $("beNote").textContent = breakEvenQty === Infinity ? "No unit margin" : (breakEvenQty <= qty ? `Break-even: ${breakEvenQty} pcs ✅` : `Break-even: ${breakEvenQty} pcs`);
+  $("nK").style.color = profit < 0 ? "#d62828" : "#0b8a6a";
+
+  /* Monte Carlo Panel */
+  const prob = directCost ? mc.probProfit : 0;
+  $("mcBarFill").style.width = prob.toFixed(1) + "%";
+  const badge = $("mcProbBadge");
+  badge.textContent = directCost ? `${prob.toFixed(0)}% Safe` : "—";
+  badge.style.background = prob >= 80 ? "#c8f5e6" : (prob >= 50 ? "#fff1b3" : "#ffd6d6");
+  $("mcMean").textContent = directCost ? inr(mc.meanProfit) : "₹0";
+  $("mcVar").textContent = directCost ? inr(mc.var95) : "₹0";
+  $("mcVar").style.color = mc.var95 < 0 ? "#d62828" : "#0b8a6a";
+
+  /* Gauge Arcs & Needle */
+  const lo = -30, hi = Math.max(40, tp + 15);
+  const P = v => {
+    const t = Math.PI * (1 - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo));
+    return [150 + 112 * Math.cos(t), 150 - 112 * Math.sin(t)];
+  };
+  const arc = (a, b) => {
+    const [x0, y0] = P(a), [x1, y1] = P(b);
+    return `M${x0} ${y0}A112 112 0 0 1 ${x1} ${y1}`;
+  };
+  $("gR").setAttribute("d", arc(lo, 0));
+  $("gY").setAttribute("d", arc(0, tp));
+  $("gG").setAttribute("d", arc(tp, hi));
+  $("needle").style.transform = `rotate(${(Math.min(hi, Math.max(lo, directCost ? om : lo)) - lo) / (hi - lo) * 180}deg)`;
+
+  /* Stacked Cost Bar including Credit & Rework Shield */
+  const base = Math.max(trueTotal, offer, 1);
+  const shield = wcCost + reworkCost;
+  let seg = costs.filter(c => c.v > 0).map(c => `<i style="width:${c.v / base * 100}%;background:${c.c}" title="${c.l}: ${inr(c.v)}"></i>`).join("");
+  if (shield > 0) seg += `<i style="width:${shield / base * 100}%;background:#14142b" title="Credit & Rework Shield: ${inr(shield)}"></i>`;
+  if (offer > trueTotal && trueTotal) seg += `<i class="pf" style="width:${(offer - trueTotal) / base * 100}%">Profit</i>`;
+  if (offer < trueTotal) seg += `<u style="left:${offer / base * 100}%"><span>short ${inr(trueTotal - offer)}</span></u>`;
+  $("stack").innerHTML = seg;
+
+  $("legend").innerHTML =
+    costs.filter(c => c.v > 0).map(c => `<span><b style="background:${c.c}"></b>${c.l} ${(c.v / trueTotal * 100).toFixed(0)}%</span>`).join("") +
+    (shield > 0 ? `<span><b style="background:#14142b"></b>Credit/Rework ${(shield / trueTotal * 100).toFixed(0)}%</span>` : "") +
+    (offer > trueTotal && trueTotal ? `<span><b style="background:#25c9a0"></b>Net profit</span>` : "");
+
+  /* Tiles Sensitivity & Leverage */
+  const mx = Math.max(...costs.map(c => c.v));
+  costs.forEach(c => {
+    const t = $("t_" + c.k);
+    t.querySelector(".sh i").style.width = (trueTotal ? c.v / trueTotal * 100 : 0) + "%";
+    t.querySelector(".badge").hidden = !(c.v > 0 && c.v === mx);
+    $("lv_" + c.k).textContent = trueTotal ? `Share: ${(c.v / trueTotal * 100).toFixed(0)}%` : "Share: 0%";
+    $("sv_" + c.k).textContent = c.v > 0 ? `−5% = +${inr(c.v * 0.05)}` : "";
+  });
+
+  /* Controls */
+  const top = Math.ceil(Math.max(rec * 1.5, offer * 1.2, trueTotal * 1.5, 2000) / 500) * 500;
+  $("offerS").max = top;
+  $("offerS").value = offer;
+  $("mOut").textContent = "₹" + Math.round(tp) + " of ₹100";
+  document.querySelectorAll("#chips .chip").forEach(b => b.classList.toggle("on", +b.dataset.m === Math.round(tp)));
+
+  $("tips").innerHTML = buildTips().map(t => `<li>${t}</li>`).join("");
+  $("say").textContent = buildScript();
+  renderLab();
+  renderSlabs();
+}
+
+function buildTips() {
+  const {costs, directCost, wcCost, reworkCost, trueTotal, offer, profit, rec, m, om, mc} = S;
+  const t = [];
+  if (!directCost) return ["👆 Start by filling in step 2. Tip: press “Try an example” at the top."];
+
+  const g = k => costs.find(c => c.k === k).v;
+  if (profit < 0) {
+    t.push(`🚨 <b>True Economic Loss of ${inr(-profit)}:</b> Including ${inr(wcCost + reworkCost)} in credit financing &amp; rework, your floor is <b>${inr(trueTotal)}</b>. Ask for <b>${inr(rec)}</b>.`);
+  } else if (om < m * 100 - 0.15) {
+    t.push(`⚠️ <b>Margin Squeeze:</b> Your net margin is ${om.toFixed(1)}% vs. your ${Math.round(m * 100)}% goal. Raise quote by <b>${inr(rec - offer)}</b> to reach ${inr(rec)}.`);
+  } else {
+    t.push(`✅ <b>Target Margin Achieved:</b> At ${inr(offer)}, you clear ${inr(profit)} net profit (${om.toFixed(1)}%) even after credit-period carry cost.`);
+  }
+
+  if (wcCost > 0) {
+    t.push(`💳 <b>Hidden Credit Bleed (${activePay.label}):</b> Waiting ${activePay.days} days for payment costs <b>${inr(wcCost)}</b> in working capital interest. Offer a 2% cash discount for 100% Advance!`);
+  }
+
+  if (mc.probProfit < 70 && offer > 0) {
+    t.push(`🎲 <b>Volatility Warning:</b> Monte Carlo simulation shows only a <b>${mc.probProfit.toFixed(0)}%</b> chance of profit (95% worst-case: <b>${inr(mc.var95)}</b>). Lock raw material rates before committing.`);
+  }
+
+  const top = [...costs].sort((a, b) => b.v - a.v)[0];
+  if (top.v > 0) {
+    t.push(`🔍 <b>Highest Profit Lever — ${top.l} (${(top.v / trueTotal * 100).toFixed(0)}%):</b> Every 5% cost reduction here adds <b>${inr(top.v * 0.05)}</b> directly to your bottom line.`);
+  }
+
+  if (g("material") && g("wastage") / g("material") > 0.05) {
+    t.push(`♻️ <b>High Scrap Ratio (${(g("wastage") / g("material") * 100).toFixed(1)}%):</b> Nesting layouts or offcut reuse to bring scrap under 4% saves <b>${inr(g("wastage") - g("material") * 0.04)}</b>.`);
+  }
+  return t;
+}
+
+function buildScript() {
+  const {directCost, trueTotal, offer, profit, rec, qty, product, om, m} = S;
+  if (!directCost) return "Your tailored negotiation message will appear here once you enter costs.";
+  const unitRec = inr(rec / qty);
+  const bulkQty = qty * 2;
+  const bulkUnit = inr((rec * 0.91) / qty);
+
+  if (activeTone === "upsell") {
+    return `“Thank you for the inquiry on ${qty} ${product}. At ${qty} pcs (${activePay.label}), our best price is ${inr(rec)} (${unitRec}/pc). However, if we combine your next requirement into a ${bulkQty}-piece batch, machine setup amortizes and we can drop your rate to ${bulkUnit}/pc—saving you ${inr(rec * 0.09 * 2)}!”`;
+  }
+  if (activeTone === "floor") {
+    return `“We value your business, but at ${inr(offer)} for ${qty} ${product}, the order falls below our direct shop-floor and ${activePay.label} financing cost (${inr(trueTotal)}). Our absolute walk-away floor is ${inr(trueTotal * 1.04)} with 50% advance, or ${inr(rec)} on ${activePay.label}.”`;
+  }
+  if (profit >= 0 && om >= m * 100 - 0.15) {
+    return `“Thank you. We are pleased to confirm ${qty} ${product} at ${inr(offer)} (${inr(offer / qty)}/pc) + GST under ${activePay.label} terms. Please share the PO so we can lock material and dispatch schedule.”`;
+  }
+  return `“For ${qty} ${product} under ${activePay.label}, our production and financing cost alone is ${inr(trueTotal)}. To ensure prime raw material and on-time delivery, our best price is ${inr(rec)} (${unitRec}/pc + GST). If you switch to 100% Advance, we can shave off the credit carry cost.”`;
+}
+
+function renderLab() {
+  const {costs, trueTotal, offer, m} = S;
+  const ms = +$("matS").value, ws = +$("wasS").value;
+  const mat = costs[0].v, was = costs[5].v;
+  $("msO").textContent = ms + "%";
+  $("wsO").textContent = ws + "%";
+
+  const sv = mat * ms / 100 + was * ws / 100;
+  const nt = trueTotal - sv;
+  const np = offer - nt;
+  $("whatif").innerHTML = sv
+    ? `You save <b>${inr(sv)}</b>. New net result: <b>${np < 0 ? "loss " + inr(-np) : "profit " + inr(np)}</b>. Fair price drops to <b>${inr(nt / (1 - m))}</b>.`
+    : "Move sliders to simulate material & scrap reductions.";
+
+  /* Multi-Criteria True Landed Supplier Scoring (Base + Freight + Scrap Yield Loss + Credit Carry Advantage) */
+  const suppliers = [1, 2, 3].map(i => {
+    const base = num("s" + i);
+    const freight = num("f" + i);
+    const scrap = num("d" + i) / 100;
+    const credDays = num("c" + i);
+    if (!base) return null;
+    // Effective landed cost: (Base / (1 - scrap)) + Freight - Working Capital Credit Saved (14% p.a.)
+    const yieldAdjusted = base / Math.max(0.5, 1 - scrap);
+    const creditBenefit = base * 0.14 * (credDays / 365);
+    const landed = yieldAdjusted + freight - creditBenefit;
+    return {name: "ABC"[i - 1], base, landed, scrap: scrap * 100, credDays};
+  }).filter(Boolean);
+
+  if (suppliers.length) {
+    suppliers.sort((a, b) => a.landed - b.landed);
+    const best = suppliers[0];
+    const diff = mat - best.landed;
+    $("supOut").innerHTML = `Winner: <b>Supplier ${best.name}</b> — True Landed Cost <b>${inr(best.landed)}</b> (Sticker ${inr(best.base)}, ${best.scrap}% scrap, ${best.credDays}d credit). ` +
+      (diff > 0 ? `Beats current material cost by <b>${inr(diff)}</b>.` : "Your current rate is already competitive.");
+    $("useSup").dataset.v = Math.round(best.landed);
+  } else {
+    $("supOut").textContent = "Enter at least one supplier quote.";
+    delete $("useSup").dataset.v;
+  }
+}
+
+/* Wright's Learning Curve (88% learning rate => b = ln(0.88)/ln(2) = -0.1844) + Fixed Setup Amortization */
+function renderSlabs() {
+  const {directCost, trueVariable, trueFixed, qty, m, offer} = S;
+  if (!directCost) {
+    $("slabGrid").innerHTML = "";
+    $("elasticityBox").innerHTML = "Enter costs in Step 2 to unlock Volume Economies &amp; Price-Elasticity analysis.";
+    return;
+  }
+
+  const b = Math.log(0.88) / Math.log(2); // 88% manufacturing learning curve
+  const multipliers = [
+    {mult: 1, tag: "Current Order", best: false},
+    {mult: 2.5, tag: "2.5× Growth Slab", best: true},
+    {mult: 5, tag: "5× Bulk Contract", best: false}
+  ];
+
+  $("slabGrid").innerHTML = multipliers.map(sl => {
+    const q = Math.max(1, Math.round(qty * sl.mult));
+    const scaleFactor = Math.pow(sl.mult, b); // Unit variable cost drops via Wright's curve + bulk material discount
+    const newUnitVar = (trueVariable / qty) * scaleFactor;
+    const newUnitFixed = trueFixed / q; // Fixed setup & tooling amortized over larger batch
+    const totalSlabCost = (newUnitVar + newUnitFixed) * q;
+    const recSlabPrice = totalSlabCost / (1 - m);
+    const slabProfit = recSlabPrice - totalSlabCost;
+
+    return `
+      <div class="slab ${sl.best ? "best" : ""}">
+        <div>
+          <span class="slab-tag">${sl.tag}</span>
+          <h4 style="margin-top:6px;font-size:17px">${q.toLocaleString("en-IN")} pcs</h4>
+          <div style="font-size:12.5px;color:#4b4b6b;margin-top:4px">
+            Unit Cost: <b>${inr(totalSlabCost / q)}</b><br>
+            Ask Price: <b>${inr(recSlabPrice)}</b> (${inr(recSlabPrice / q)}/pc)<br>
+            Net Profit: <b style="color:#0b8a6a">${inr(slabProfit)}</b>
+          </div>
+        </div>
+        <button type="button" class="btn w sm" data-apply-tier="${q}" data-tier-price="${Math.round(recSlabPrice)}">Apply ${q} pcs</button>
+      </div>
+    `;
+  }).join("");
+
+  /* Price-Volume Indifference Elasticity */
+  const cmRatio = offer > 0 ? (offer - trueVariable) / offer : 0;
+  if (cmRatio > 0.05) {
+    const priceDropPct = 5;
+    const reqVolGain = (priceDropPct / (cmRatio * 100 - priceDropPct)) * 100;
+    const priceHikePct = 5;
+    const maxVolLoss = (priceHikePct / (cmRatio * 100 + priceHikePct)) * 100;
+    $("elasticityBox").innerHTML = `⚖️ <b>Price-Volume Elasticity Law:</b> Because your contribution margin is <b>${(cmRatio * 100).toFixed(0)}%</b>, giving a <b>5% discount</b> requires <b>+${reqVolGain > 0 ? reqVolGain.toFixed(0) : "∞"}% extra volume</b> just to make the same rupee profit—whereas raising price by <b>5%</b> still leaves you ahead even if you lose up to <b>${maxVolLoss.toFixed(0)}%</b> of volume!`;
+  } else {
+    $("elasticityBox").innerHTML = `⚠️ <b>Negative/Zero Contribution:</b> At the current offer (${inr(offer)}), selling more pieces increases your loss because unit price does not cover variable manufacturing cost (${inr(trueVariable / qty)}/pc).`;
+  }
+}
+
+/* Confetti & Toast */
+function confetti() {
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const c = $("cv"), x = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#3a4bff", "#ffd43b", "#ff5c93", "#25c9a0"];
+  const p = Array.from({length: 95}, () => ({
+    x: innerWidth / 2, y: innerHeight / 3,
+    vx: (Math.random() - 0.5) * 17, vy: -Math.random() * 14 - 3,
+    s: 5 + Math.random() * 7, c: cols[Math.random() * 4 | 0]
+  }));
+  let n = 0;
+  (function f() {
+    x.clearRect(0, 0, c.width, c.height);
+    p.forEach(a => {
+      a.x += a.vx; a.y += a.vy; a.vy += 0.45;
+      x.fillStyle = a.c; x.fillRect(a.x, a.y, a.s, a.s);
+    });
+    if (++n < 90) requestAnimationFrame(f);
+    else x.clearRect(0, 0, c.width, c.height);
+  })();
+}
+
+function toast(m) {
+  const t = $("toast");
+  t.textContent = m;
+  t.classList.add("on");
+  setTimeout(() => t.classList.remove("on"), 2100);
+}
+
+function setOffer(v) {
+  $("offer").value = Math.max(0, Math.round(v / 50) * 50);
+  calc();
+}
+
+/* Upgraded Print Quotation (PDF) with GST & Commercial Terms */
+function quote() {
+  if (!S.directCost) { toast("Fill in your costs first"); return; }
+  const {qty, rec, product, customer, gstPct} = S;
+  const fmtDate = d => d.toLocaleDateString("en-IN", {day:"numeric", month:"long", year:"numeric"});
+  const d = new Date();
+  const subTotal = Math.round(rec);
+  const gstAmt = Math.round(subTotal * (gstPct / 100));
+  const grandTotal = subTotal + gstAmt;
+
+  $("quote").innerHTML = `
+    <div style="border:3px solid #14142b;padding:28px;border-radius:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14142b;padding-bottom:16px">
+        <div>
+          <h1 style="margin:0;font-size:28px">COMMERCIAL QUOTATION</h1>
+          <p style="margin:4px 0 0;color:#444">Ref: QTN-${String(Date.now()).slice(-6)}</p>
+        </div>
+        <div style="text-align:right">
+          <p style="margin:0"><b>Date:</b> ${fmtDate(d)}<br><b>Valid Until:</b> ${fmtDate(new Date(+d + 15 * 864e5))}</p>
+        </div>
+      </div>
+      <p style="margin:18px 0"><b>Prepared For:</b> ${esc(customer)}<br><b>Payment Terms:</b> ${esc(activePay.label)}</p>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0">
+        <thead>
+          <tr style="background:#f1f2ff">
+            <th>Item Description</th><th>Quantity</th><th>Unit Rate</th><th>Taxable Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${esc(product)}</td>
+            <td>${qty.toLocaleString("en-IN")} pcs</td>
+            <td>${inr(subTotal / qty)}</td>
+            <td>${inr(subTotal)}</td>
+          </tr>
+          ${gstPct > 0 ? `<tr><td colspan="3" style="text-align:right"><b>GST @ ${gstPct}%</b></td><td>${inr(gstAmt)}</td></tr>` : ""}
+        </tbody>
+      </table>
+      <h2 style="text-align:right;margin:12px 0">Grand Total: ${inr(grandTotal)}</h2>
+      <p><b>Standard Commercial Terms:</b></p>
+      <ul>
+        <li>Payment Terms: <b>${esc(activePay.label)}</b>.</li>
+        <li>Raw material price validity: 15 days from quotation date.</li>
+        <li>Delivery schedule confirmed upon receipt of formal Purchase Order.</li>
+      </ul>
+      <p style="margin-top:48px">Authorised Signatory: ____________________________</p>
+    </div>
+  `;
+  print();
+}
+
+/* LocalStorage Persistence + Gamified Factory Rank & KPI Analytics */
+const load = () => { try { return JSON.parse(localStorage.getItem("fpai_v2") || "[]"); } catch (e) { return []; } };
+const store = a => { try { localStorage.setItem("fpai_v2", JSON.stringify(a)); } catch (e) { toast("Could not save in this browser mode"); } };
+
+function updateHud(orders) {
+  const safeCount = orders.filter(o => o.profit > 0).length;
+  $("streakBadge").textContent = `🔥 Safe Deals: ${safeCount}`;
+
+  let rank = "🏅 Rank: Apprentice Estimator";
+  if (safeCount >= 10) rank = "👑 Rank: Margin Grandmaster";
+  else if (safeCount >= 5) rank = "🚀 Rank: Profit Architect";
+  else if (safeCount >= 2) rank = "⚡ Rank: Sharp Negotiator";
+  $("rankBadge").textContent = rank;
+
+  const totalQuoted = orders.reduce((s, o) => s + (o.offer || 0), 0);
+  const avgMargin = orders.length
+    ? orders.reduce((s, o) => s + (o.offer > 0 ? (o.profit / o.offer) * 100 : 0), 0) / orders.length
+    : 0;
+  const safeRate = orders.length ? (safeCount / orders.length) * 100 : 0;
+
+  $("kTotal").textContent = inr(totalQuoted);
+  $("kMargin").textContent = avgMargin.toFixed(1) + "%";
+  $("kSafe").textContent = safeRate.toFixed(0) + "%";
+}
+
+function list() {
+  const a = load();
+  updateHud(a);
+  $("orders").tBodies[0].innerHTML = a.length
+    ? a.map((o, i) => `
+      <tr>
+        <td>${o.date}</td>
+        <td><b>${esc(o.product)}</b><br><small style="color:#4b4b6b">${esc(o.customer || "")}</small></td>
+        <td>${o.qty}</td>
+        <td>${inr(o.total)}</td>
+        <td>${inr(o.offer)}</td>
+        <td style="color:${o.profit < 0 ? "#d62828" : "#0b8a6a"};font-weight:900">
+          ${o.profit < 0 ? "Loss " : "Profit "}${inr(Math.abs(o.profit))}
+        </td>
+        <td>
+          <div class="row" style="gap:5px">
+            <button type="button" class="chip" data-load="${i}" title="Load into calculator">Load</button>
+            <button type="button" class="chip" data-del="${i}" aria-label="Delete">✕</button>
+          </div>
+        </td>
+      </tr>`).join("")
+    : '<tr><td colspan="7">No orders saved yet. Analyze a deal and press “Save order”.</td></tr>';
+}
+
+/* Event Wiring */
+document.addEventListener("input", e => {
+  if (e.target.matches("input, select")) calc();
+});
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-d]");
+  if (b) {
+    $(b.dataset.k).value = Math.max(0, num(b.dataset.k) + +b.dataset.d);
+    beep(+b.dataset.d > 0 ? 580 : 440, 0.045);
+    calc();
+  }
+
+  const c = e.target.closest("[data-m]");
+  if (c) {
+    $("marginS").value = c.dataset.m;
+    beep(620, 0.05);
+    calc();
+  }
+
+  const p = e.target.closest("[data-pay]");
+  if (p) {
+    activePay = PAY_TERMS.find(x => x.id === p.dataset.pay) || PAY_TERMS[2];
+    document.querySelectorAll("[data-pay]").forEach(el => el.classList.toggle("on", el.dataset.pay === activePay.id));
+    beep(540, 0.05);
+    calc();
+  }
+
+  const tn = e.target.closest("[data-tone]");
+  if (tn) {
+    activeTone = tn.dataset.tone;
+    document.querySelectorAll("[data-tone]").forEach(el => el.classList.toggle("tab-on", el.dataset.tone === activeTone));
+    beep(500, 0.045);
+    $("say").textContent = buildScript();
+  }
+
+  const tier = e.target.closest("[data-apply-tier]");
+  if (tier) {
+    const newQty = +tier.dataset.applyTier;
+    const oldQty = Math.max(1, num("qty"));
+    const ratio = newQty / oldQty;
+    const bExp = Math.log(0.88) / Math.log(2);
+    const scaleVar = Math.pow(ratio, bExp) * ratio;
+
+    F.forEach(f => {
+      const cur = num(f[0]);
+      if (cur > 0) {
+        $(f[0]).value = f[5] === "variable" ? Math.round(cur * scaleVar) : cur;
+      }
+    });
+    $("qty").value = newQty;
+    $("offer").value = +tier.dataset.tierPrice;
+    calc();
+    chordWin();
+    confetti();
+    toast(`Scaled to ${newQty} pcs with learning curve!`);
+  }
+
+  const ld = e.target.closest("[data-load]");
+  if (ld) {
+    const o = load()[+ld.dataset.load];
+    if (o && o.raw) {
+      for (const k in o.raw) if ($(k)) $(k).value = o.raw[k];
+      if (o.payId) {
+        activePay = PAY_TERMS.find(x => x.id === o.payId) || PAY_TERMS[2];
+        document.querySelectorAll("[data-pay]").forEach(el => el.classList.toggle("on", el.dataset.pay === activePay.id));
+      }
+      calc();
+      beep(660, 0.07);
+      toast("Order loaded into calculator");
+    } else {
+      toast("Summary-only row loaded");
+    }
+  }
+
+  const d = e.target.closest("[data-del]");
+  if (d) {
+    const a = load();
+    a.splice(+d.dataset.del, 1);
+    store(a);
+    list();
+    beep(340, 0.05);
+  }
+});
+
+$("soundToggle").onclick = () => {
+  soundOn = !soundOn;
+  $("soundToggle").textContent = soundOn ? "🔊 SFX: ON" : "🔇 SFX: OFF";
+  $("soundToggle").setAttribute("aria-pressed", String(soundOn));
+  if (soundOn) beep(660, 0.06);
+};
+
+$("offerS").oninput = e => setOffer(+e.target.value);
+
+$("useRec").onclick = () => {
+  if (!S.directCost) { toast("Fill in your costs first"); return; }
+  setOffer(S.rec);
+  chordWin();
+  confetti();
+  toast("Offer updated to fair price: " + inr(S.rec));
+};
+
+$("rerunMc").onclick = () => {
+  mcSeed = Math.floor(Math.random() * 999999) + 1;
+  beep(700, 0.05);
+  calc();
+  toast("Re-ran 2,500 Monte Carlo volatility trials");
+};
+
+$("applyWhat").onclick = () => {
+  const ms = +$("matS").value, ws = +$("wasS").value;
+  if (!ms && !ws) { toast("Move a slider first"); return; }
+  $("material").value = Math.round(num("material") * (1 - ms / 100));
+  $("wastage").value = Math.round(num("wastage") * (1 - ws / 100));
+  $("matS").value = 0;
+  $("wasS").value = 0;
+  calc();
+  chordWin();
+  confetti();
+  toast("Cost savings applied!");
+};
+
+$("useSup").onclick = e => {
+  const v = e.target.dataset.v;
+  if (!v) { toast("Enter supplier quotes first"); return; }
+  $("material").value = v;
+  calc();
+  beep(620, 0.06);
+  toast("Material set to effective landed cost: " + inr(+v));
+};
+
+$("quoteBtn").onclick = quote;
+
+$("saveBtn").onclick = () => {
+  if (!S.directCost) { toast("Fill in your costs first"); return; }
+  const raw = {};
+  ["product","customer","qty","material","labour","electricity","transport","machine","wastage","other","offer","marginS","rejPct","gstRate"].forEach(k => raw[k] = $(k).value);
+  const a = load();
+  a.unshift({
+    date: new Date().toLocaleDateString("en-IN"),
+    product: S.product,
+    customer: S.customer,
+    qty: S.qty,
+    total: S.trueTotal,
+    offer: S.offer,
+    profit: S.profit,
+    payId: activePay.id,
+    raw
+  });
+  store(a);
+  list();
+  if (S.profit > 0) { chordWin(); confetti(); } else beep(480, 0.07);
+  toast("Order saved to ledger!");
+};
+
+const cp = async (t, m) => {
+  try { await navigator.clipboard.writeText(t); toast(m); }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = t; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    toast(m);
+  }
+};
+
+$("copySay").onclick = () => { beep(600, 0.05); cp(buildScript().replace(/[“”]/g, ""), "Negotiation script copied"); };
+
+$("copyPrompt").onclick = () => {
+  const {costs, directCost, wcCost, reworkCost, trueTotal, offer, profit, rec, m, qty, product, customer, mc} = S;
+  cp(`You are a senior manufacturing cost engineer advising an Indian factory owner. Order: ${qty} units of ${product} for ${customer} under ${activePay.label}. Direct Costs: ${costs.map(c => c.l + " " + inr(c.v)).join(", ")} (Subtotal ${inr(directCost)}). Working Capital & Rework Shield: ${inr(wcCost + reworkCost)}. True Economic Cost: ${inr(trueTotal)}. Customer Offer: ${inr(offer)} (${profit < 0 ? "Loss " : "Net Profit "}${inr(Math.abs(profit))}). Monte Carlo Profit Probability: ${mc.probProfit.toFixed(0)}% (95% VaR ${inr(mc.var95)}). Target Net Margin: ${Math.round(m * 100)}%; Recommended Fair Price: ${inr(rec)}. Give 3 shop-floor cost-engineering actions and a crisp counter-offer strategy without recalculating my figures.`, "AI prompt copied");
+};
+
+$("csvBtn").onclick = () => {
+  const a = load();
+  if (!a.length) { toast("Nothing saved yet"); return; }
+  const csv = "Date,Product,Customer,Qty,TrueCost,Offer,NetProfit\n" +
+    a.map(o => [o.date, '"' + (o.product || "").replace(/"/g, '""') + '"', '"' + (o.customer || "").replace(/"/g, '""') + '"', o.qty, Math.round(o.total), Math.round(o.offer), Math.round(o.profit)].join(",")).join("\n");
+  const l = document.createElement("a");
+  l.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  l.download = "factory-profit-ledger.csv";
+  l.click();
+};
+
+$("jsonBtn").onclick = () => {
+  const a = load();
+  if (!a.length) { toast("Nothing saved yet"); return; }
+  const l = document.createElement("a");
+  l.href = URL.createObjectURL(new Blob([JSON.stringify(a, null, 2)], {type:"application/json"}));
+  l.download = "factory-profit-ledger.json";
+  l.click();
+};
+
+$("sample").onclick = () => {
+  const v = {
+    product:"CNC Machined Brackets",
+    customer:"ABC Engineering Ltd",
+    qty:100,
+    material:10000,
+    labour:3000,
+    electricity:1000,
+    transport:1000,
+    machine:600,
+    wastage:650,
+    other:350,
+    offer:16500,
+    marginS:20,
+    rejPct:2.5,
+    gstRate:18,
+    matS:0,
+    wasS:0
+  };
+  for (const k in v) $(k).value = v[k];
+  activePay = PAY_TERMS[2]; // Net 30
+  document.querySelectorAll("[data-pay]").forEach(el => el.classList.toggle("on", el.dataset.pay === activePay.id));
+  calc();
+  beep(560, 0.06);
+  toast("Example loaded: Net 30 order @ ₹16,500");
+};
+
+$("reset").onclick = () => {
+  document.querySelectorAll("input[type=text],input[type=number]").forEach(i => i.value = "");
+  $("qty").value = 1;
+  $("marginS").value = 20;
+  $("rejPct").value = 2;
+  $("gstRate").value = 18;
+  $("matS").value = 0;
+  $("wasS").value = 0;
+  calc();
+  toast("Cleared for a fresh quote");
+};
+
+$("sample").click();
+list();
+</script>
+</body>
+</html>
